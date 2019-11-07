@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon --exe babel -node server.js",
     "test2": "mocha --require babel-register tests/*.js",
+    "test3": "mocha --compilers js:@babel/register",
     "test": "jest --coverage --coverageReporters=text-lcov | coveralls",
-    "test1": "./node_modules/mocha/bin/mocha ./tests/test*",
+    "test1": "./node_modules/mocha/bin/mocha ./tests/*",
     "test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec ./tests/*",
     "build": "babel db.js --out-dir build",
     "dev-start": "babel-watch server.js"
@@ -35,6 +37,10 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/node": "^7.7.0",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/register": "^7.7.0",
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-watch": "^2.0.8",
@@ -42,6 +48,7 @@
     "istanbul": "^0.4.5",
     "jest": "^24.9.0",
     "make-runnable": "^1.3.6",
+    "mocha": "^6.2.2",
     "mocha-lcov-reporter": "^1.3.0"
   }
 }

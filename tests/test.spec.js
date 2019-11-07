@@ -4,6 +4,10 @@ import chaiHttp from 'chai-http';
 import app from '../server';
 
 
+// const chaiHttp = require('chai-http');
+// const chai = require('chai');
+// const app = require('../server');
+
 chai.use(chaiHttp);
 chai.should();
 
@@ -13,7 +17,7 @@ describe('Users', () => {
       chai.request(app)
         .get('/api/v1/users')
         .end((err, res) => {
-          res.should.have.status(200);
+          res.status.should.be.equal(200);
           res.body.should.be.a('object');
           done();
         });
@@ -31,7 +35,7 @@ describe('Users', () => {
         .post('/api/v1/users')
         .send(data)
         .end((err, res) => {
-          res.should.have.status(400);
+          res.status.should.be.equal(400);
           // res.body.should.be.a('object');
           done();
         });
@@ -44,7 +48,7 @@ describe('Articles', () => {
       chai.request(app)
         .get('/api/v1/articles')
         .end((err, res) => {
-          res.should.have.status(200);
+          res.status.should.be.equal(200);
           res.body.should.be.a('object');
           done();
         });
@@ -61,7 +65,7 @@ describe('Articles', () => {
         .post('/api/v1/articles')
         .send(data)
         .end((err, res) => {
-          res.should.have.status(201);
+          res.status.should.be.equal(201);
           // res.body.should.be.a('object');
           done();
         });
@@ -78,7 +82,8 @@ describe('Articles', () => {
         .put('/api/v1/articles/1')
         .send(data)
         .end((err, res) => {
-          res.should.have.status(200);
+          res.status.should.be.equal(200);
+          // res.should.have.status(200);
           // res.body.should.be.a('object');
           done();
         });

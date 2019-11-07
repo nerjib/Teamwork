@@ -8,10 +8,11 @@
     "test2": "mocha --require babel-register tests/*.js",
     "test3": "mocha --compilers js:@babel/register",
     "test": "jest --coverage --coverageReporters=text-lcov | coveralls",
-    "test1": "./node_modules/mocha/bin/mocha ./tests/*",
+    "test1": "./node_modules/./bin/mocha ./tests/*",
     "test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec ./tests/*",
     "build": "babel db.js --out-dir build",
-    "dev-start": "babel-watch server.js"
+    "dev-start": "babel-watch server.js",
+    "coveralls": "jest --coverage && cat ./tests/coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",

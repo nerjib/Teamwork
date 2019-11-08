@@ -1,12 +1,12 @@
 /* eslint-disable no-undef */
-import chai from 'chai';
-import chaiHttp from 'chai-http';
-import app from '../server';
+// import { chai } from 'chai';
+// import chaiHttp from 'chai-http';
+// import app from '../server';
 
 
-// const chaiHttp = require('chai-http');
-// const chai = require('chai');
-// const app = require('../server');
+const chaiHttp = require('chai-http');
+const chai = require('chai');
+const app = require('../server');
 
 chai.use(chaiHttp);
 chai.should();

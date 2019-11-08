@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --exe babel -node server.js",
-    "test2": "mocha --require babel-register tests/*.js",
+    "test2": "mocha --require babel-register test/*.js",
     "test3": "mocha --compilers js:@babel/register",
     "test": "jest --coverage --coverageReporters=text-lcov | coveralls",
-    "test1": "./node_modules/./bin/mocha ./tests/*",
-    "test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec ./tests/*",
+    "test1": "./node_modules/mocha/bin/mocha ./test/test*",
+    "test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec ./test/*",
     "build": "babel db.js --out-dir build",
     "dev-start": "babel-watch server.js",
     "coveralls": "jest --coverage && cat ./tests/coverage/lcov.info | coveralls"

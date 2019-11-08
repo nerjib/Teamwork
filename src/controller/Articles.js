@@ -1,55 +1,153 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 import moment from 'moment';
-import uuidv4 from 'uuid/v4';
+// import uuidv4 from 'uuid/v4';
 import db from '../db';
+// import Helper from './Helper';
+
+// const moment = require('moment');
+// const uuidv4 = require('uuid/v4');
+// const db = require('../db');
 
 const Articles = {
+  // post new articles
   async create(req, res) {
-    console.log(req.body);
-    const createQuery = `INSERT INTO articles
-      (id, postername, article, gifurl, post_date)
-      VALUES($1, $2, $3, $4, $5)
-      returning *`;
+    console.log('d');
+    const createQuery = `INSERT INTO
+    articles (userid, title, article, createdon)
+    VALUES ($1, $2, $3, $4) RETURNING *`;
     const values = [
-      uuidv4(),
       req.body.username,
+      req.body.title,
       req.body.article,
-      req.body.gifurl,
       moment(new Date()),
     ];
 
     try {
       const { rows } = await db.query(createQuery, values);
-      return res.status(201).send(rows[0]);
-    } catch (error) {
-      return res.status(400).send(error);
-    }
-  },
-  async getAll(req, res) {
-    const findAllQuery = 'SELECT * FROM articles';
-    try {
-      const { rows, rowCount } = await db.query(findAllQuery);
-      return res.status(200).send({ rows, rowCount });
+      // console.log(rows);
+      const data = {
+        status: 'success',
+        data: {
+          message: 'Article successfully posted​',
+          articleID: rows[0].id,
+          createdon: rows[0].createdon,
+          title: rows[0].title,
+        },
+      };
+      return res.status(201).send(data);
     } catch (error) {
       return res.status(400).send(error);
     }
   },
 
+  // update/ edit article post
+  async updateArticles(req, res) {
+    const findOneQuery = 'SELECT * FROM articles WHERE id=$1 AND userid = $2';
+    const updateOneQuery = `UPDATE articles
+      SET article=$1 WHERE id=$2  AND  userid=$3 RETURNING *`;
+    try {
+      const { rows } = await db.query(findOneQuery, [req.params.id, req.body.username]);
+      if (!rows[0]) {
+        return res.status(404).send({ message: 'Article not found' });
+      }
+      console.log(rows[0].id);
+      const values = [
+        req.body.article || rows[0].article,
+        rows[0].id,
+        req.body.username,
+      ];
+      const { response } = await db.query(updateOneQuery, values);
+      const ress = {
+        status: 'success',
+        data: {
+          message: 'article successfully updated',
+          title: req.body.title,
+          article: req.body.article,
+        },
+      };
+      return res.status(200).send(ress);
+    } catch (err) {
+      return res.status(400).send('article not updated');
+    }
+  },
+
+  // Dellete article
+  async deleteArticle(req, res) {
+    const deleteQuery = 'DELETE FROM articles WHERE id=$1 AND userid = $2 returning *';
+    // console.log(req.user.id);
+    try {
+      const { rows } = await db.query(deleteQuery, [req.params.id, req.body.username]);
+      if (!rows[0]) {
+        return res.status(404).send({ message: 'Article not found' });
+      }
+      return res.status(200).send({ message: 'Article successfully deleted' });
+    } catch (error) {
+      return res.status(400).send(error);
+    }
+  },
+
+  // post comment
+  async postComments(req, res) {
+    console.log(req.body);
+    const createQuery = `INSERT INTO comments
+            (userid, comment, articleid, post_date)
+        VALUES($1, $2, $3, $4)
+        returning *`;
+    const values = [
+      // uuidv4(),
+      req.body.username,
+      req.body.comment,
+      req.params.id,
+      moment(new Date()),
+    ];
+
+    try {
+      const { rows } = await db.query(createQuery, values);
+      const response = {
+        status: 'success',
+        data: {
+          message: 'Comment successfully created',
+          createdOn: rows[0].post_date,
+          comment: rows[0].comment,
+        },
+      };
+      return res.status(201).send(response);
+    } catch (error) {
+      return res.status(400).send(error);
+    }
+  },
+
+  async getAll(req, res) {
+    const findAllQuery = 'SELECT id FROM articles';
+    try {
+      const { rows, rowCount } = await db.query(findAllQuery);
+      const data = {
+        status: 'success',
+      };
+      return res.status(200).send(rows);
+    } catch (error) {
+      return res.status(400).send(error);
+    }
+  },
+  // Get single article
   async getOne(req, res) {
-    const text = 'SELECT * FROM articles WHERE articleID = $1';
+    const text = 'SELECT * FROM articles WHERE id = $1';
+    const articleComment = 'SELECT * FROM comments WHERE articleid = $1';
     console.log(req.params.id);
     try {
       const { rows } = await db.query(text, [req.params.id]);
       if (!rows[0]) {
-        return res.status(404).send({ message: 'User not found' });
+        return res.status(404).send({ message: 'Article Not found' });
       }
-      return res.status(200).send(rows[0]);
+      const artRows = await db.query(articleComment, [req.params.id]);
+      return res.status(200).send(artRows);
     } catch (error) {
       return res.status(400).send(error);
     }
   },
   async getComment(req, res) {
-    const text = 'SELECT * FROM articles WHERE articleID = $1';
+    const text = 'SELECT * FROM articles WHERE articleid = $1';
     console.log(req.params.id);
     try {
       const { rows } = await db.query(text, [req.params.id]);
@@ -57,28 +155,6 @@ const Articles = {
         return res.status(404).send({ message: 'User not found' });
       }
       return res.status(200).send(rows[0]);
-    } catch (error) {
-      return res.status(400).send(error);
-    }
-  },
-
-  async postComments(req, res) {
-    console.log(req.body);
-    const createQuery = `INSERT INTO comments
-            (comentorName, comment, articleID, post_date)
-        VALUES($1, $2, $3, $4)
-        returning *`;
-    const values = [
-      // uuidv4(),
-      req.body.com_UName,
-      req.body.comment,
-      req.body.articleID,
-      moment(new Date()),
-    ];
-
-    try {
-      const { rows } = await db.query(createQuery, values);
-      return res.status(201).send(rows[0]);
     } catch (error) {
       return res.status(400).send(error);
     }
@@ -93,50 +169,6 @@ const Articles = {
         return res.status(404).send({ message: 'User not found' });
       }
       return res.status(200).send(rows[0]);
-    } catch (error) {
-      return res.status(400).send(error);
-    }
-  },
-
-
-  // update post
-  async updateArticles(req, res) {
-    const findOneQuery = 'SELECT * FROM articles WHERE articleID=$1 AND postername = $2';
-    const updateOneQuery = `UPDATE articles
-      SET article=$1 WHERE articleid=$2 AND  postername=$3 returning *`;
-    try {
-      const { rows } = await db.query(findOneQuery, [req.params.id, req.body.com_UName]);
-      if (!rows[0]) {
-        return res.status(404).send({ message: 'Article not found' });
-      }
-      console.log(req.body.com_UName);
-      const values = [
-        req.body.article || rows[0].article,
-        req.params.id || rows[0].articleid,
-        req.body.com_UName,
-      ];
-      const response = await db.query(updateOneQuery, values);
-      const ress = {
-        status: 'success',
-        data: {
-          article: response.rows[0].article,
-          atid: response.rows[0].articleid,
-        },
-      };
-      return res.status(200).send(ress);
-    } catch (err) {
-      return res.status(400).send(err);
-    }
-  },
-  // Dellete article
-  async deleteArticle(req, res) {
-    const deleteQuery = 'DELETE FROM articles WHERE articleID=$1 AND postername = $2 returning *';
-    try {
-      const { rows } = await db.query(deleteQuery, [req.params.id, req.user.id]);
-      if (!rows[0]) {
-        return res.status(404).send({ message: 'user not found' });
-      }
-      return res.status(204).send({ message: 'deleted' });
     } catch (error) {
       return res.status(400).send(error);
     }

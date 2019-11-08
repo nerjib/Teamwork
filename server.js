@@ -8,6 +8,12 @@ import Articles from './src/controller/Articles';
 import Users from './src/controller/Users';
 import Auth from './src/middleware/Auth';
 
+// const express = require('express');
+// const dotenv = require('dotenv');
+// const Articles = require('./src/controller/Articles');
+// const Users = require('./src/controller/Users');
+// const Auth = require('./src/middleware/Auth');
+
 dotenv.config();
 const app = express();
 
@@ -20,17 +26,14 @@ app.get('/', (req, res) => {
 app.post('/api/v1/articles', Articles.create);
 app.get('/api/v1/articles', Articles.getAll);
 app.get('/api/v1/articles/:id', Articles.getOne);
-app.post('/api/v1/articles/:id/', Articles.postComments);
+app.post('/api/v1/articles/:id/comments', Articles.postComments);
+app.delete('/api/v1/articles/:id', Articles.deleteArticle);
 app.get('/api/v1/articles/:id/comments/', Articles.getOneComments);
 app.put('/api/v1/articles/:id', Articles.updateArticles);
-// app.get('/api/v1/users/:id', Auth.verifyToken, Posts.getOne);
-// app.get('/api/v1/article/:id',  PostArticle.getOne);
-// app.put('/api/v1/reflections/:id', Auth.verifyToken, PostArticle.update);
-// app.delete('/api/v1/reflections/:id', Auth.verifyToken, PostArticle.delete);
+app.post('/api/v1/auth/create-user', Users.create);
+app.post('/api/v1/auth/signin', Users.login);
 app.post('/api/v1/users', Users.create);
 app.get('/api/v1/users', Users.getAll);
-// app.get('/api/v1/users/:id',  users.getOne);
-// app.post('/api/v1/users/login', Users.login);
 app.delete('/api/v1/users/me', Auth.verifyToken, Users.deleteUser);
 
 app.listen(3000);

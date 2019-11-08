@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import moment from 'moment';
-import uuidv4 from 'uuid/v4';
+// import uuidv4 from 'uuid/v4';
 import db from '../db';
 import Helper from './Helper';
 
@@ -12,30 +12,67 @@ const User = {
     }
     const hashPassword = Helper.hashPassword(req.body.password);
     const createQuery = `INSERT INTO
-      users (id, name, username, pword, email, role, created_date)
-      VALUES($1, $2, $3, $4, $5, $6, $7)
-      returning *`;
+      users (fname, lname, username, pword, email, role, dept, address, created_date)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`;
     const values = [
-      uuidv4(),
-      req.body.name,
+      req.body.fname,
+      req.body.lname,
       req.body.username,
       hashPassword,
       req.body.email,
       req.body.role,
+      req.body.dept,
+      req.body.address,
       moment(new Date()),
     ];
-
     try {
       const { rows } = await db.query(createQuery, values);
-      const token = Helper.generateToken(rows[0].id);
-      return res.status(201).send({ token });
+      // console.log(rows);
+      const token1 = Helper.generateToken(rows[0].id);
+      const data = {
+        status: 'success',
+        data: {
+          message: 'User account successfully created',
+          token: token1,
+          userId: rows[0].id,
+        },
+      };
+      return res.status(201).send(data);
     } catch (error) {
-      if (error.routine === '_bt_check_unique') {
-        return res.status(400).send({ message: 'User with that EMAIL already exist' });
-      }
       return res.status(400).send(error);
     }
   },
+  // Login
+  async login(req, res) {
+    if (!req.body.email || !req.body.password) {
+      return res.status(400).send({ message: 'Some values are missing' });
+    }
+    if (!Helper.isValidEmail(req.body.email)) {
+      return res.status(400).send({ message: 'Please enter a valid email address' });
+    }
+    const text = 'SELECT * FROM users WHERE email = $1';
+    try {
+      const { rows } = await db.query(text, [req.body.email]);
+      if (!rows[0]) {
+        return res.status(400).send({ message: 'The credentials you provided is incorrect' });
+      }
+      if (!Helper.comparePassword(rows[0].pword, req.body.password)) {
+        return res.status(400).send({ message: 'The credentials you provided is incorrect' });
+      }
+      const token1 = Helper.generateToken(rows[0].id);
+      const data = {
+        status: 'success',
+        data: {
+          token: token1,
+          userId: rows[0].id,
+        },
+      };
+      return res.status(200).send(data);
+    } catch (error) {
+      return res.status(400).send(error);
+    }
+  },
+
   // view all Team members
   async getAll(req, res) {
     const findAllQuery = 'SELECT * FROM users';
@@ -43,7 +80,7 @@ const User = {
       const { rows, rowCount } = await db.query(findAllQuery);
       return res.status(200).send({ rows, rowCount });
     } catch (error) {
-      return res.status(400).send(error);
+      return res.status(200).send(error);
     }
   },
 

@@ -17,12 +17,15 @@ pool.on('connect', () => {
 const createTeamUsers = () => {
   const queryText = `CREATE TABLE IF NOT EXISTS
       users(
-        id UUID PRIMARY KEY,
-        name TEXT NULL,
-        userName VARCHAR(100) UNIQUE NOT NULL,
-        pWord VARCHAR(100) NULL,
-        email VARCHAR(100) NULL,
+        id SERIAL PRIMARY KEY,
+        fName VARCHAR(100) NOT NULL,
+        lName VARCHAR(100) Null,
+        username VARCHAR(100) UNIQUE NOT NULL,
+        pWord TEXT NOT NULL,
+        email VARCHAR(100) NOT NULL,
         role VARCHAR(100) Null,
+        dept VARCHAR(100) NOT NULL,
+        address VARCHAR(255) NULL,
         created_date TIMESTAMP
       )`;
 
@@ -43,11 +46,11 @@ const createTeamUsers = () => {
 const createArticleTable = () => {
   const queryText = `CREATE TABLE IF NOT EXISTS
       articles(
-        id UUID PRIMARY KEY,
-        posterName VARCHAR(128) NOT NULL,
+        id SERIAL PRIMARY KEY,
+        userId VARCHAR(128) NOT NULL,
+        title VARCHAR(128) NOT NULL,
         article TEXT NOT NULL,
-        gifUrl TEXT NOT NULL,
-        post_date TIMESTAMP
+        createdOn TIMESTAMP
       )`;
 
   pool.query(queryText)
@@ -61,11 +64,33 @@ const createArticleTable = () => {
     });
 };
 
+const createGifTable = () => {
+  const queryText = `CREATE TABLE IF NOT EXISTS
+      gifs(
+        id SERIAL PRIMARY KEY,
+        userId VARCHAR(128) NOT NULL,
+        title VARCHAR(128) NOT NULL,
+        gifUrl TEXT NOT NULL,
+        createdOn TIMESTAMP
+      )`;
+
+  pool.query(queryText)
+    .then((res) => {
+      console.log(res);
+      pool.end();
+    })
+    .catch((err) => {
+      console.log(err);
+      pool.end();
+    });
+};
+
+
 const createCommentTable = () => {
   const queryText = `CREATE TABLE IF NOT EXISTS
       comments(
         id SERIAL PRIMARY KEY,
-        comentorName VARCHAR(128) NOT NULL,
+        userId VARCHAR(128) NOT NULL,
         comment TEXT NOT NULL,
         articleID TEXT NOT NULL,
         post_date TIMESTAMP
@@ -121,6 +146,7 @@ pool.on('remove', () => {
 module.exports = {
   createTeamUsers,
   createArticleTable,
+  createGifTable,
   dropTeamUsers,
   droppostTable,
   createCommentTable,

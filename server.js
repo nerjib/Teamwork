@@ -38,4 +38,7 @@ app.delete('/api/v1/users/me', Auth.verifyToken, Users.deleteUser);
 
 app.listen(3000);
 console.log('app running on port ', 3000);
+// module.exports = {
+//  app,
+// };
 export default app;

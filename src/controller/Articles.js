@@ -130,10 +130,10 @@ const Articles = {
       return res.status(400).send(error);
     }
   },
-  // Get single article
+  // Get single article with comments
   async getOne(req, res) {
     const text = 'SELECT * FROM articles WHERE id = $1';
-    const articleComment = 'SELECT * FROM comments WHERE articleid = $1';
+    const articleComment = 'SELECT * FROM comments WHERE articleid= $1';
     console.log(req.params.id);
     try {
       const { rows } = await db.query(text, [req.params.id]);
@@ -141,7 +141,7 @@ const Articles = {
         return res.status(404).send({ message: 'Article Not found' });
       }
       const artRows = await db.query(articleComment, [req.params.id]);
-      return res.status(200).send(artRows);
+      return res.status(200).send({ messagE: 'success', rows });
     } catch (error) {
       return res.status(400).send(error);
     }

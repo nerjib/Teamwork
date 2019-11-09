@@ -46,7 +46,6 @@
     "@babel/node": "^7.7.0",
     "@babel/preset-env": "^7.7.1",
     "@babel/register": "^7.7.0",
-    "babel2-cli1": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-watch": "^2.0.8",
     "coveralls": "^3.0.7",

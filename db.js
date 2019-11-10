@@ -47,10 +47,11 @@ const createArticleTable = () => {
   const queryText = `CREATE TABLE IF NOT EXISTS
       articles(
         id SERIAL PRIMARY KEY,
-        userId VARCHAR(128) NOT NULL,
+        userId INT NOT NULL,
         title VARCHAR(128) NOT NULL,
         article TEXT NOT NULL,
-        createdOn TIMESTAMP
+        createdOn TIMESTAMP,
+        FOREIGN KEY (userId) REFERENCES users(id)
       )`;
 
   pool.query(queryText)
@@ -68,10 +69,12 @@ const createGifTable = () => {
   const queryText = `CREATE TABLE IF NOT EXISTS
       gifs(
         id SERIAL PRIMARY KEY,
-        userId VARCHAR(128) NOT NULL,
+        userId INT NOT NULL,
         title VARCHAR(128) NOT NULL,
         gifUrl TEXT NOT NULL,
-        createdOn TIMESTAMP
+        createdOn TIMESTAMP,
+        FOREIGN KEY (userId) REFERENCES users(id)
+
       )`;
 
   pool.query(queryText)
@@ -90,10 +93,12 @@ const createCommentTable = () => {
   const queryText = `CREATE TABLE IF NOT EXISTS
       comments(
         id SERIAL PRIMARY KEY,
-        userId VARCHAR(128) NOT NULL,
+        userId INT NOT NULL,
         comment TEXT NOT NULL,
         articleID TEXT NOT NULL,
-        post_date TIMESTAMP
+        post_date TIMESTAMP,
+        FOREIGN KEY (userid) REFERENCES articles(id)
+
       )`;
 
   pool.query(queryText)
@@ -107,10 +112,17 @@ const createCommentTable = () => {
     });
 };
 
-/**
- */
-const dropTeamUsers = () => {
-  const queryText = 'DROP TABLE IF EXISTS users returning *';
+const createGifCommentTable = () => {
+  const queryText = `CREATE TABLE IF NOT EXISTS
+      giComments(
+        id SERIAL PRIMARY KEY,
+        userId INT NOT NULL,
+        comment TEXT NOT NULL,
+        gifID TEXT NOT NULL,
+        post_date TIMESTAMP,
+        FOREIGN KEY (userid) REFERENCES gifs(id)
+      )`;
+
   pool.query(queryText)
     .then((res) => {
       console.log(res);
@@ -147,9 +159,9 @@ module.exports = {
   createTeamUsers,
   createArticleTable,
   createGifTable,
-  dropTeamUsers,
   droppostTable,
   createCommentTable,
+  createGifCommentTable,
 };
 
 require('make-runnable');

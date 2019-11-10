@@ -22,15 +22,15 @@ app.use(express.json());
 app.get('/', (req, res) => {
   return res.status(200).send({ message: 'YAY! Endpoint is working' });
 });
-
-app.post('/api/v1/articles', Articles.create);
-app.get('/api/v1/articles', Articles.getAll);
-app.get('/api/v1/articles/:id', Articles.getOne);
-app.post('/api/v1/articles/:id/comments', Articles.postComments);
-app.delete('/api/v1/articles/:id', Articles.deleteArticle);
-app.get('/api/v1/articles/:id/comments/', Articles.getOneComments);
-app.put('/api/v1/articles/:id', Articles.updateArticles);
-app.post('/api/v1/auth/create-user', Users.create);
+app.get('/api/v1/articles/me', Auth.verifyToken, Articles.getMyArticles);
+app.post('/api/v1/articles', Auth.verifyToken, Articles.create);
+app.get('/api/v1/articles', Auth.verifyToken, Articles.getAll);
+app.get('/api/v1/articles/:id', Auth.verifyToken, Articles.getOne);
+app.post('/api/v1/articles/:id/comments', Auth.verifyToken, Articles.postComments);
+app.delete('/api/v1/articles/:id', Auth.verifyToken, Articles.deleteArticle);
+app.get('/api/v1/articles/:id/comments/', Auth.verifyToken, Articles.getOneComments);
+app.put('/api/v1/articles/:id', Auth.verifyToken, Articles.updateArticles);
+app.post('/api/v1/auth/create-user', Auth.verifyToken, Users.create);
 app.post('/api/v1/auth/signin', Users.login);
 app.post('/api/v1/users', Users.create);
 app.get('/api/v1/users', Users.getAll);

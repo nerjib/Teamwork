@@ -11,6 +11,7 @@ const User = {
       return res.status(400).send({ message: 'Some values are missing' });
     }
     const hashPassword = Helper.hashPassword(req.body.password);
+    console.log(hashPassword);
     const createQuery = `INSERT INTO
       users (fname, lname, username, pword, email, role, dept, address, created_date)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`;
@@ -50,12 +51,13 @@ const User = {
     if (!Helper.isValidEmail(req.body.email)) {
       return res.status(400).send({ message: 'Please enter a valid email address' });
     }
-    const text = 'SELECT * FROM users WHERE email = $1';
+    const text = 'SELECT * FROM users WHERE username = $1';
     try {
-      const { rows } = await db.query(text, [req.body.email]);
+      const { rows } = await db.query(text, [req.body.username]);
       if (!rows[0]) {
-        return res.status(400).send({ message: 'The credentials you provided is incorrect' });
+        return res.status(400).send({ message: 'user not found, check the username' });
       }
+      console.log(rows[0].pword);
       if (!Helper.comparePassword(rows[0].pword, req.body.password)) {
         return res.status(400).send({ message: 'The credentials you provided is incorrect' });
       }
@@ -67,7 +69,7 @@ const User = {
           userId: rows[0].id,
         },
       };
-      return res.status(200).send(data);
+      return res.status(200).send({ status: 'success', data });
     } catch (error) {
       return res.status(400).send(error);
     }

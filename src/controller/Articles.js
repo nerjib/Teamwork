@@ -12,12 +12,12 @@ import db from '../db';
 const Articles = {
   // post new articles
   async create(req, res) {
-    console.log('d');
+    console.log(req.user.id);
     const createQuery = `INSERT INTO
     articles (userid, title, article, createdon)
     VALUES ($1, $2, $3, $4) RETURNING *`;
     const values = [
-      req.body.username,
+      req.user.id,
       req.body.title,
       req.body.article,
       moment(new Date()),
@@ -47,7 +47,7 @@ const Articles = {
     const updateOneQuery = `UPDATE articles
       SET article=$1 WHERE id=$2  AND  userid=$3 RETURNING *`;
     try {
-      const { rows } = await db.query(findOneQuery, [req.params.id, req.body.username]);
+      const { rows } = await db.query(findOneQuery, [req.params.id, req.user.id]);
       if (!rows[0]) {
         return res.status(404).send({ message: 'Article not found' });
       }
@@ -55,7 +55,7 @@ const Articles = {
       const values = [
         req.body.article || rows[0].article,
         rows[0].id,
-        req.body.username,
+        req.user.id,
       ];
       const { response } = await db.query(updateOneQuery, values);
       const ress = {
@@ -77,7 +77,7 @@ const Articles = {
     const deleteQuery = 'DELETE FROM articles WHERE id=$1 AND userid = $2 returning *';
     // console.log(req.user.id);
     try {
-      const { rows } = await db.query(deleteQuery, [req.params.id, req.body.username]);
+      const { rows } = await db.query(deleteQuery, [req.params.id, req.user.id]);
       if (!rows[0]) {
         return res.status(404).send({ message: 'Article not found' });
       }
@@ -96,7 +96,7 @@ const Articles = {
         returning *`;
     const values = [
       // uuidv4(),
-      req.body.username,
+      req.user.id,
       req.body.comment,
       req.params.id,
       moment(new Date()),
@@ -119,7 +119,7 @@ const Articles = {
   },
 
   async getAll(req, res) {
-    const findAllQuery = 'SELECT id FROM articles';
+    const findAllQuery = 'SELECT * FROM articles';
     try {
       const { rows, rowCount } = await db.query(findAllQuery);
       const data = {
@@ -133,6 +133,8 @@ const Articles = {
   // Get single article with comments
   async getOne(req, res) {
     const text = 'SELECT * FROM articles WHERE id = $1';
+    // const text = 'SELECT articles.article, comments.comment FROM articles INNER JOIN comments ON
+    // article.id=comments.userid';
     const articleComment = 'SELECT * FROM comments WHERE articleid= $1';
     console.log(req.params.id);
     try {
@@ -140,8 +142,8 @@ const Articles = {
       if (!rows[0]) {
         return res.status(404).send({ message: 'Article Not found' });
       }
-      const artRows = await db.query(articleComment, [req.params.id]);
-      return res.status(200).send({ messagE: 'success', rows });
+      const { artRows } = await db.query(articleComment, [req.params.id]);
+      return res.status(200).send({ messagE: 'success', artRows });
     } catch (error) {
       return res.status(400).send(error);
     }
@@ -173,6 +175,23 @@ const Articles = {
       return res.status(400).send(error);
     }
   },
+  async getMyArticles(req, res) {
+    const text1 = 'SELECT * FROM articles CROSS JOIN comments'; // WHERE id = $1';
+    const text = 'SELECT * FROM articles WHERE userid = $1';
+    console.log(req.user.id);
+    try {
+      const { rows } = await db.query(text1, [req.user.id]);
+      if (!rows[0]) {
+        return res.status(404).send({ message: 'User j not found' });
+      }
+      console.log(rows[0].username);
+      const { rows1 } = await db.query(text, ['me1']);
+      return res.status(200).send(rows);
+    } catch (error) {
+      return res.status(400).send(error);
+    }
+  },
 };
+
 
 export default Articles;

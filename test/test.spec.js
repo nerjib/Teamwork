@@ -1,22 +1,31 @@
 /* eslint-disable no-undef */
-import chai from 'chai';
-import chaiHttp from 'chai-http';
-import app from '../server';
+
+// import app from '../server';
 
 
-// const chaiHttp = require('chai-http');
-// const chai = require('chai');
-// const app = require('../server');
+const chaiHttp = require('chai-http');
+const chai = require('chai');
+const { app } = require('../server');
+const db = require('../src/query');
+
 // const should = chai.should();
 afterAll(() => setTimeout(() => process.exit(), 1000));
 
 chai.use(chaiHttp);
 chai.should();
+/*
+// eslint-disable-next-line prefer-destructuring
+const expect = require('chai').expect;
+
+const request = require('superset');
+const { app } = require('../server');
+const db = require('../src/query');
+*/
 
 const data = {
   fname: 'Najib',
   lname: 'Lere',
-  username: 'me3',
+  username: 'me367',
   password: '11',
   email: 'nk@gmaisl.com',
   role: 'admin',
@@ -29,22 +38,32 @@ const data = {
 };
 
 describe('Users', () => {
+  before((done) => {
+    db.pool.connect()
+      .then(() => done())
+      .catch((err) => done(err));
+  });
+  after((done) => {
+    db.pool.end()
+      .then(() => done())
+      .catch((err) => done(err));
+  });
   describe('get /', () => {
     it('should get all users', async (done) => {
       chai.request(app)
-        .get('/api/v1/users')
+        .get('/user')
         .end((err, res) => {
           // res.should.have.status(200);
-          res.status.should.be.equal(200);
+          res.status.should.be.equal(201);
           // res.body.should.be.a('object');
           done();
         });
     });
   });
   describe('Post /', () => {
-    it('trying to  add user that exist', async (done) => {
+    it('trying to  add user that exist', (done) => {
       chai.request(app)
-        .post('/api/v1/users')
+        .post('/user')
         .send(data)
         .end((err, res) => {
           res.status.should.be.equal(400);
@@ -54,41 +73,26 @@ describe('Users', () => {
     });
   });
 });
-describe('Articles', () => {
-  describe('get /', () => {
-    it('should get all articles', async (done) => {
-      chai.request(app)
-        .get('/api/v1/articles')
-        .end((err, res) => {
-          res.status.should.be.equal(200);
-          // res.body.should.be.a('object');
-          done();
-        });
-    });
+/*
+describe('pos', () => {
+  before((done) => {
+    db.pool.connect()
+      .then(() => done())
+      .catch((err) => done(err));
   });
-  describe('Posting articles /', () => {
-    it('trying to  add articles ', (done) => {
-      chai.request(app)
-        .post('/api/v1/articles')
-        .send(data)
-        .end((err, res) => {
-          res.status.should.be.equal(201);
-          // res.body.should.be.a('object');
-          done();
-        });
-    });
+  after((done) => {
+    db.pool.end()
+      .then(() => done())
+      .catch((err) => done(err));
   });
-  describe('Update /', () => {
-    it('updating existing article', async (done) => {
-      chai.request(app)
-        .put('/api/v1/articles/2')
-        .send(data)
-        .end((err, res) => {
-          res.status.should.be.equal(210);
-          // res.should.have.status(200);
-          // res.body.should.be.a('object');
-          done();
-        });
-    });
+  it('dk', (done) => {
+    request(app.post('/api/v1/users'))
+      .send(data)
+      .then((res) => {
+        const body = res.body;
+        expect(body).to.contain.property('id');
+      });
+    done();
   });
 });
+*/

@@ -6,7 +6,7 @@
 const chaiHttp = require('chai-http');
 const chai = require('chai');
 const { app } = require('../server');
-const db = require('../src/query');
+const db = require('../src/dbs/query');
 
 // const should = chai.should();
 afterAll(() => setTimeout(() => process.exit(), 1000));

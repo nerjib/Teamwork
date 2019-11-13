@@ -2,7 +2,7 @@
   "name": "teamwork",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "nodemon --exe babel -node server.js",
     "test2": "mocha --require babel-register test/*.js",

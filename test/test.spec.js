@@ -1,3 +1,4 @@
+/* eslint-disable arrow-parens */
 /* eslint-disable no-undef */
 
 // import app from '../server';
@@ -6,10 +7,8 @@
 const chaiHttp = require('chai-http');
 const chai = require('chai');
 const { app } = require('../server');
-const db = require('../src/dbs/query');
-
 // const should = chai.should();
-afterAll(() => setTimeout(() => process.exit(), 1000));
+// afterAll(() => setTimeout(() => process.exit(), 1000));
 
 chai.use(chaiHttp);
 chai.should();
@@ -38,23 +37,19 @@ const data = {
 };
 
 describe('Users', () => {
-  before((done) => {
-    db.pool.connect()
-      .then(() => done())
-      .catch((err) => done(err));
-  });
-  after((done) => {
-    db.pool.end()
-      .then(() => done())
-      .catch((err) => done(err));
-  });
   describe('get /', () => {
+    beforeAll(done => {
+      app.listen(done);
+    });
+    afterAll(done => {
+      app.close(done);
+    });
     it('should get all users', async (done) => {
       chai.request(app)
         .get('/user')
         .end((err, res) => {
           // res.should.have.status(200);
-          res.status.should.be.equal(201);
+          res.status.should.be.equal(404);
           // res.body.should.be.a('object');
           done();
         });
@@ -66,7 +61,7 @@ describe('Users', () => {
         .post('/user')
         .send(data)
         .end((err, res) => {
-          res.status.should.be.equal(400);
+          res.status.should.be.equal(404);
           // res.body.should.be.a('object');
           done();
         });
@@ -96,3 +91,7 @@ describe('pos', () => {
   });
 });
 */
+
+afterAll(async () => {
+  await app.close();
+});

@@ -4,7 +4,49 @@
 
 const moment = require('moment');
 const db = require('../dbs/query.js');
-const Helper = require('../controllers/helper');
+const Helper = require('./helper');
+
+
+// create user
+/*
+async function createUser(req, res) {
+  if (!req.body.username || !req.body.password) {
+    return res.status(400).send({ message: 'Some values are missing' });
+  }
+  const hashPassword = Helper.hashPassword(req.body.password);
+  console.log(hashPassword);
+  const createQuery = `INSERT INTO
+    users (fname, lname, username, pword, email, role, dept, address, created_date)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`;
+  const values = [
+    req.body.fname,
+    req.body.lname,
+    req.body.username,
+    hashPassword,
+    req.body.email,
+    req.body.role,
+    req.body.dept,
+    req.body.address,
+    moment(new Date()),
+  ];
+  try {
+    const { rows } = await db.query(createQuery, values);
+    // console.log(rows);
+    const token1 = Helper.generateToken(rows[0].id);
+    const data = {
+      status: 'success',
+      data: {
+        message: 'User account successfully created',
+        token: token1,
+        userId: rows[0].id,
+      },
+    };
+    return res.status(201).json(data);
+  } catch (error) {
+    return res.status(400).send(error);
+  }
+}
+*/
 
 async function createUser(req, res) {
   // check if user is admin
@@ -58,6 +100,7 @@ async function createUser(req, res) {
   }
 }
 
+
 async function getAll(req, res) {
   const getAllQ = 'SELECT * FROM users';
   try {
@@ -71,6 +114,8 @@ async function getAll(req, res) {
     return res.status(400).send(`${error} jsh`);
   }
 }
+
+
 // Login
 async function login(req, res) {
   console.log(req.body.email);

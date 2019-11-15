@@ -163,5 +163,3 @@ module.exports = {
   createCommentTable,
   createGifCommentTable,
 };
-
-require('make-runnable');

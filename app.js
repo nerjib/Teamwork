@@ -66,7 +66,7 @@ const upload = multer({
 
 app.use(bodyParser.json());
 app.use('/api/v1/users', Auth.verifyToken, Users);
-app.use('/api/v1/auth/create-user', authUsers);
+app.use('/api/v1/auth/create-user', Auth.verifyAdmin, authUsers);
 app.use('/api/v1/auth/signin', authUsersSignIn);
 app.use('/api/v1/articles', Auth.verifyToken, Articles);
 app.post('/api/v1/gifs/:id/comments', Auth.verifyToken, async (req, res) => {

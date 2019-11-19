@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon --exe babel -node server.js",
+    "start": "node server.js",
     "test2": "mocha --require babel-register tests*.js",
     "test3": "mocha --require js:@babel/register",
     "test4": "./node_modules/.bin/mocha --compilers js:@babel/register",

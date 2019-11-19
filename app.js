@@ -65,31 +65,31 @@ const upload = multer({
 
 
 app.use(bodyParser.json());
-app.use('/api/v1/users', Auth.verifyToken, Users);
-app.use('/api/v1/auth/create-user', Auth.verifyAdmin, authUsers);
+app.use('/api/v1/users', Users);
+app.use('/api/v1/auth/create-user', authUsers);
 app.use('/api/v1/auth/signin', authUsersSignIn);
-app.use('/api/v1/articles', Auth.verifyToken, Articles);
-app.post('/api/v1/gifs/:id/comments', Auth.verifyToken, async (req, res) => {
+app.use('/api/v1/articles', Articles);
+app.post('/api/v1/gifs/:id/comments', async (req, res) => {
   Gifs.postGifComment(req, res);
 });
-app.get('/api/v1/gifs', Auth.verifyToken, async (req, res) => {
+app.get('/api/v1/gifs', async (req, res) => {
   Gifs.getGif(req, res);
 });
-app.get('/api/v1/gifs/:id', Auth.verifyToken, async (req, res) => {
+app.get('/api/v1/gifs/:id', async (req, res) => {
   Gifs.getOne(req, res);
 });
-app.delete('/api/v1/gifs/:id', Auth.verifyToken, async (req, res) => {
+app.delete('/api/v1/gifs/:id', async (req, res) => {
   Gifs.deleteGif(req, res);
 });
 
-app.post('/api/v1/gifs', upload.single('image'), Auth.verifyToken, (req, res) => {
+app.post('/api/v1/gifs', upload.single('image'), (req, res) => {
   cloudinary.uploader.upload(req.file.path, function (result) {
     // console.log(req.file);
     Gifs.createGif(req, res, result.secure_url);
   });
 });
 
-app.get('/api/v1/feeds', Auth.verifyToken, async (req, res) => {
+app.get('/api/v1/feeds', async (req, res) => {
   Feeds.getAll(req, res);
 });
 

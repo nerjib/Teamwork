@@ -137,7 +137,7 @@ async function login(req, res) {
       return res.status(400).send({ message: 'The credentials you provided is incorrect' });
     }
     // const k = (rows[0].id);
-    const token1 = Helper.generateToken(rows[0].id);
+    const token1 = Helper.generateToken(rows[0].id, rows[0].role);
     const data = {
       status: 'success',
       data: {
@@ -152,19 +152,7 @@ async function login(req, res) {
   }
 }
 // view single member
-async function getOne(req, res) {
-  const text = 'SELECT * FROM users WHERE username = $1';
-  console.log(req.params.id);
-  try {
-    const { rows } = await db.query(text, [req.params.id]);
-    if (!rows[0]) {
-      return res.status(404).send({ message: 'User not found' });
-    }
-    return res.status(200).send(rows[0]);
-  } catch (error) {
-    return res.status(400).send(error);
-  }
-}
+
 
 // delete user
 async function deleteUser(req, res) {

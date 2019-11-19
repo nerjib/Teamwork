@@ -15,9 +15,10 @@ const isValidEmail = (email) => {
   return /\S+@\S+\.\S+/.test(email);
 };
 
-const generateToken = (id) => {
+const generateToken = (id, role) => {
   const token = jwt.sign({
     userId: id,
+    role,
   },
   'secret', { expiresIn: '7d' });
   return token;

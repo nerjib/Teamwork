@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DATATYPE === 'test' ? process.env.DATABASE_URL1 : process.env.DATABASE_URL,
   // ssl: true,
 });
 
@@ -16,7 +16,7 @@ const query = (text, params) => {
   return new Promise((resolve, reject) => {
     pool.query(text, params)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         resolve(res);
       })
       .catch((err) => {

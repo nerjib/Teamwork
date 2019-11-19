@@ -8,11 +8,8 @@ const Helper = require('../src/controllers/helper');
 
 dotenv.config();
 
-// we also need our app for the correct routes!
 const db = require('../src/dbs');
-const app = require('../app1');
-// const app1 = require('../app');
-// const db1 = require('../src/dbs/query')
+const app = require('../app');
 
 let auth = [];
 
@@ -25,9 +22,7 @@ beforeAll(async () => {
   await db.query("INSERT INTO users (fname, username, pword, email, role, dept, address) VALUES ('user1','user21','11','user@gmail.com','staff','it','kd')");
   await db.query('CREATE TABLE IF NOT EXISTS comments(id SERIAL PRIMARY KEY, userid INT NOT NULL, comment TEXT NOT NULL, articleid INTEGER NOT NULL, post_date TIMESTAMP, FOREIGN KEY (articleid) REFERENCES articles(id))');
   await db.query('CREATE TABLE IF NOT EXISTS gifs(id SERIAL PRIMARY KEY, userId INT NOT NULL, title VARCHAR(128) NOT NULL, gifUrl TEXT NOT NULL, createdOn TIMESTAMP, FOREIGN KEY (userId) REFERENCES users(id))');
-  await db.query('CREATE TABLE IF NOT EXISTS gifComments(id SERIAL PRIMARY KEY, userid INT NOT NULL, comment TEXT NOT NULL, gifID INTEGER NOT NULL, post_date TIMESTAMP, FOREIGN KEY (gifid) REFERENCES gifs(id))')
-  // await db.query("INSERT INTO articles(userid, title, article) VALUES('1', 'comments', '1 art')");
-  // await db.query("INSERT INTO comments(userid, comment, articleid) VALUES('1', 'comments', '1')");
+  await db.query('CREATE TABLE IF NOT EXISTS gifComments(id SERIAL PRIMARY KEY, userid INT NOT NULL, comment TEXT NOT NULL, gifID INTEGER NOT NULL, post_date TIMESTAMP, FOREIGN KEY (gifid) REFERENCES gifs(id))');
   auth.token1 = Helper.generateToken(1, 'admin');
 });
 
@@ -50,7 +45,7 @@ afterAll(async () => {
 
 describe('POST /create', () => {
   test('It responds with the newly created staff', async () => {
-    const data = await request(app)
+    const response = await request(app)
       .post('/api/v1/auth/create-user')
       .set('token', auth.token1)
       .send({
@@ -66,50 +61,39 @@ describe('POST /create', () => {
     // make sure we add it correctly
     // expect(login.body.fname).toBe('id');
     // expect(newStudent.body.name).toBe('New Student');
-    expect(data.statusCode).toBe(201);
-
-    // make sure we have 3 students now
-    // const response = await request(app).get('/students');
-    // expect(response.body.length).toBe(3);
+    console.log(response.body.data);
+    expect(response.body.data).toHaveProperty('token');
+    expect(response.body.data.message).toBe('User account successfully created');
+    expect(response.statusCode).toBe(201);
   });
 });
 // sign in
 describe('POST /students', () => {
   test('staff signin', async () => {
-
-    const login = await request(app)
+    const response = await request(app)
       .post('/api/v1/auth/signin')
       .send({
         email: 'nk@gmail.com',
         password: '11',
       });
     // console.log(login.body);
-    auth.token = login.body.data.token;
-    const decoded = await jwt.verify(login.body.data.token, 'secret');
+    auth.token = response.body.data.token;
+    const decoded = await jwt.verify(response.body.data.token, 'secret');
     auth.id = decoded.userId;
-    console.log(auth.id);
-    // make sure we add it correctly
-    // expect(login.body.fname).toBe('id');
-    // expect(newStudent.body.name).toBe('New Student');
-    expect(login.statusCode).toBe(200);
-
-    // make sure we have 3 students now
-    // const response = await request(app).get('/students');
-    // expect(response.body.length).toBe(3);
+    // console.log(auth.id);
+    expect(response.body.data).toHaveProperty('token');
+    expect(response.statusCode).toBe(200);
   });
 });
 
-describe('GET /students', () => {
+describe('GET users', () => {
   test('It responds with an array of users', async () => {
     const response = await request(app).get('/api/v1/users').set('token', auth.token);
     expect(response.body.length).toBe(2);
-  //  expect(response.body[0]).toHaveProperty('id');
-    // expect(response.body[0]).toHaveProperty('name');
-    // expect(response.statusCode).toBe(200);
   });
 });
-describe('GET one students', () => {
-  test('It responds with an array of users', async () => {
+describe('GET one user', () => {
+  test('It responds with one user', async () => {
     const response = await request(app).get('/api/v1/users/1').set('token', auth.token);
     expect(response.body.email).toBe('user@gmail.com');
     // expect(response.body[0]).toHaveProperty('id');
@@ -120,23 +104,21 @@ describe('GET one students', () => {
 
 describe('POST /Article', () => {
   test('create article', async () => {
-    const data = await request(app)
+    const response = await request(app)
       .post('/api/v1/articles')
       .set('token', auth.token)
       .send({
         title: 'my article',
         article: 'aticulated article',
       });
-    // make sure we add it correctly
-    // expect(login.body.fname).toBe('id');
-    // expect(newStudent.body.name).toBe('New Student');
-    expect(data.statusCode).toBe(201);
+    expect(response.body.data).toHaveProperty('articleId');
+    expect(response.statusCode).toBe(201);
   });
 });
 
 describe('Modify Article', () => {
   test('update article', async () => {
-    const data1 = await request(app)
+    const response1 = await request(app)
       .post('/api/v1/articles')
       .set('token', auth.token)
       .send({
@@ -144,23 +126,20 @@ describe('Modify Article', () => {
         article: 'aticulated article',
       });
       // console.log(data1.body);
-    const data = await request(app)
-      .put(`/api/v1/articles/${data1.body.data.articleID}`)
+    const response = await request(app)
+      .put(`/api/v1/articles/${response1.body.data.articleId}`)
       .set('token', auth.token)
       .send({
         title: 'my article',
         article: 'updated aticulated article',
       });
-    // make sure we add it correctly
-    // expect(login.body.fname).toBe('id');
-    // expect(newStudent.body.name).toBe('New Student');
-    expect(data.statusCode).toBe(200);
+    expect(response.statusCode).toBe(200);
   });
 });
 
 describe('DeleteArticle', () => {
   test('delete article', async () => {
-    const data1 = await request(app)
+    const response1 = await request(app)
       .post('/api/v1/articles')
       .set('token', auth.token)
       .send({
@@ -168,13 +147,11 @@ describe('DeleteArticle', () => {
         article: 'aticulated article',
       });
       // console.log(data1.body);
-    const data = await request(app)
-      .delete(`/api/v1/articles/${data1.body.data.articleID}`)
+    const response = await request(app)
+      .delete(`/api/v1/articles/${response1.body.data.articleId}`)
       .set('token', auth.token);
-    // make sure we add it correctly
-    // expect(login.body.fname).toBe('id');
-    // expect(newStudent.body.name).toBe('New Student');
-    expect(data.statusCode).toBe(200);
+    expect(response.body.data.message).toBe('Article successfully deleted');
+    expect(response.statusCode).toBe(200);
   });
 });
 
@@ -183,12 +160,20 @@ describe('GET all articles', () => {
     const response = await request(app)
       .get('/api/v1/articles')
       .set('token', auth.token);
-    // expect(response.body.email).toBe('user@gmail.com');
-    // expect(response.body[0]).toHaveProperty('id');
-    // expect(response.body[0]).toHaveProperty('name');
     expect(response.statusCode).toBe(200);
   });
 });
+/*
+describe('GET all articles', () => {
+  test('It returns array of article', async () => {
+    const response = await request(app)
+      .get('/api/v1/feeds')
+      .set('token', auth.token);
+    console.log(response);
+    expect(response.statusCode).toBe(200);
+  });
+});
+*/
 describe('POST /comments', () => {
   test('post comment on article', async () => {
     const dataa = await request(app)
@@ -199,24 +184,20 @@ describe('POST /comments', () => {
         title: 'my article',
         article: 'aticulated article',
       });
-    console.log(dataa.body.data.articleID);
+    // console.log(dataa.body.data.articleID);
     const data = await request(app)
-      .post(`/api/v1/articles/${dataa.body.data.articleID}/comments`)
+      .post(`/api/v1/articles/${dataa.body.data.articleId}/comments`)
       .set('token', auth.token)
       .send({
         id: '1',
         comment: 'aticulated article comment',
       });
-    // make sure we add it correctly
-    // expect(login.body.fname).toBe('id');
-    // expect(newStudent.body.name).toBe('New Student');
     expect(data.statusCode).toBe(201);
   });
 });
 
 describe('GET one article', () => {
-  test('It return one article', async () => {
-
+  test('It return one article with it comments', async () => {
     const dataa = await request(app)
       .post('/api/v1/articles')
       .set('token', auth.token)
@@ -225,19 +206,16 @@ describe('GET one article', () => {
         title: 'my article',
         article: 'aticulated article',
       });
-    const data = await request(app)
-      .post(`/api/v1/articles/${dataa.body.data.articleID}/comments`)
+    await request(app)
+      .post(`/api/v1/articles/${dataa.body.data.articleId}/comments`)
       .set('token', auth.token)
       .send({
         id: '1',
         comment: 'aticulated article comment',
       });
     const response = await request(app)
-      .get(`/api/v1/articles/${dataa.body.data.articleID}`)
+      .get(`/api/v1/articles/${dataa.body.data.articleId}`)
       .set('token', auth.token);
-    // expect(response.body.email).toBe('user@gmail.com');
-    // expect(response.body[0]).toHaveProperty('id');
-    // expect(response.body[0]).toHaveProperty('name');
     expect(response.statusCode).toBe(200);
   });
 });
@@ -251,9 +229,6 @@ describe('POST Gifs', () => {
       .set('Content-Type', 'application/x-www-form-urlencoded')
       .field('title', 'buttons')
       .attach('image', fs.readFileSync('./src/im/btn.gif'), 'btn.gif');
-    // make sure we add it correctly
-    // expect(login.body.fname).toBe('id');
-    // expect(newStudent.body.name).toBe('New Student');
     expect(data.statusCode).toBe(201);
     // console.log(data.body);
   });
@@ -267,10 +242,6 @@ describe('Comment', () => {
       .set('Content-Type', 'application/x-www-form-urlencoded')
       .field('title', 'buttons')
       .attach('image', fs.readFileSync('./src/im/btn.gif'), 'btn.gif');
-    // make sure we add it correctly
-    // expect(login.body.fname).toBe('id');
-    // expect(newStudent.body.name).toBe('New Student');
-    // console.log(data1.body);
     const data = await request(app)
       .post(`/api/v1/gifs/${data1.body.data.gifID}/comments`)
       .set('token', auth.token)
@@ -284,9 +255,6 @@ describe('Comment', () => {
 describe('GET / all gif', () => {
   test('It responds with an array of users', async () => {
     const response = await request(app).get('/api/v1/gifs').set('token', auth.token);
-  //  expect(response.body.length).toBe(2);
-  //  expect(response.body[0]).toHaveProperty('id');
-    // expect(response.body[0]).toHaveProperty('name');
     expect(response.statusCode).toBe(200);
   });
 });
@@ -328,10 +296,6 @@ describe('Gif', () => {
       .set('Content-Type', 'application/x-www-form-urlencoded')
       .field('title', 'buttons')
       .attach('image', fs.readFileSync('./src/im/btn.gif'), 'btn.gif');
-    // make sure we add it correctly
-    // expect(login.body.fname).toBe('id');
-    // expect(newStudent.body.name).toBe('New Student');
-    // console.log(data1.body);
     const data = await request(app)
       .delete(`/api/v1/gifs/${data1.body.data.gifID}`)
       .set('token', auth.token);

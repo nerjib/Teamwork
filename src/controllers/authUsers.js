@@ -1,8 +1,6 @@
 const express = require('express');
 const moment = require('moment');
 
-const Auth = require('../middlewares/auth');
-
 const Helper = require('./helper');
 
 const router = express.Router();
@@ -34,9 +32,17 @@ router.post('/', async (req, res) => {
 
   try {
     const { rows } = await db.query(createQuery, values);
-    // const token = Helper.generateToken(rows[0].id);
+    const token = Helper.generateToken(rows[0].id);
     // console.log(`this is the token ${token}`);
-    return res.status(201).json(rows);
+    const response = {
+      status: 'success',
+      data: {
+        message: 'User account successfully created',
+        token,
+        userId: rows[0].id,
+      },
+    };
+    return res.status(201).send(response);
   } catch (error) {
     if (error.routine === '_bt_check_unique') {
       return res.status(404).send({ message: 'User with that username already exist' });

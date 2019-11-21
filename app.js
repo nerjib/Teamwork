@@ -3,6 +3,7 @@
 /* eslint-disable prefer-arrow-callback */
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const cloudinary = require('cloudinary');
 const multer = require('multer');
@@ -21,7 +22,7 @@ const Auth = require('./src/middlewares/auth');
 const app = express();
 
 dotenv.config();
-
+/*
 // HANDLING CORS ERRORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -32,10 +33,18 @@ app.use((req, res, next) => {
   }
   next();
 });
+*/
 
-app.get('/', (req, res) => {
-  res.send('wellcome');
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  next();
 });
+
+app.use(cors());
+
+
 
 
 const storage = multer.diskStorage({
@@ -47,9 +56,9 @@ const storage = multer.diskStorage({
   },
 });
 cloudinary.config({
-  cloud_name: 'nerjib',
-  api_key: '626821658299598',
-  api_secret: 'UtFa7ftuWa7aRa1H90Cj1R3abKc',
+  cloud_name: process.env.cloud_name,
+  api_key: process.env.api_key,
+  api_secret: process.env.api_secret,
 });
 const fileFilter = (req, file, cb) => {
   if (file.mimetype === 'image/gif') {
@@ -80,6 +89,12 @@ app.get('/api/v1/gifs/:id', Auth.verifyToken, async (req, res) => {
 });
 app.delete('/api/v1/gifs/:id', Auth.verifyToken, async (req, res) => {
   Gifs.deleteGif(req, res);
+});
+app.get('/', (req, res) => {
+  res.json({
+    wellcome: 'ggg',
+    dd: 'ggfd',
+  });
 });
 
 app.post('/api/v1/gifs', upload.single('image'), Auth.verifyToken, (req, res) => {

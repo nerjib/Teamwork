@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
         userId: rows[0].id,
       },
     };
-
+    res.cookie('token', token, { httpOnly: true }).status(200);
     return res.status(200).send(response);
   } catch (error) {
     return res.status(405).send(error);

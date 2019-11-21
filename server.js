@@ -5,9 +5,9 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 
 const app = require('./app');
 
-app.listen(PORT, () => console.log('server starting on port 3000!'));
+app.listen(PORT, () => console.log(`server starting on port ${PORT}!`));

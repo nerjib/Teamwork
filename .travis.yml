@@ -10,8 +10,8 @@ services:
   - postgresql
 
 before_script:
-  -npm install
-  -np, install nyc -g
+  - npm install
+  - npm install nyc -g
   - psql -c 'create database travis_ci_test;' -U postgres
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter

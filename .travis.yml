@@ -18,5 +18,6 @@ before_script:
   
 script: "npm run-script test6"
     
-after_script: "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+after_script: 
+  - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

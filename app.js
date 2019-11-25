@@ -3,7 +3,11 @@
 /* eslint-disable prefer-arrow-callback */
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const http = require('http');
+const path = require('path');
+
 
 const cloudinary = require('cloudinary');
 const multer = require('multer');
@@ -15,12 +19,11 @@ const Gifs = require('./src/controllers/gifs');
 const authUsersSignIn = require('./src/controllers/authSignIn');
 const Feeds = require('./src/controllers/feeds');
 
-
 const Auth = require('./src/middlewares/auth');
 
 
 const app = express();
-
+http.createServer(app);
 dotenv.config();
 /*
 // HANDLING CORS ERRORS
@@ -43,8 +46,10 @@ app.use((req, res, next) => {
 });
 
 app.use(cors());
-
-
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 
 const storage = multer.diskStorage({
@@ -72,8 +77,6 @@ const upload = multer({
   fileFilter,
 });
 
-
-app.use(bodyParser.json());
 app.use('/api/v1/users', Auth.verifyToken, Users);
 app.use('/api/v1/auth/create-user', Auth.verifyAdmin, authUsers);
 app.use('/api/v1/auth/signin', authUsersSignIn);
@@ -102,6 +105,9 @@ app.post('/api/v1/gifs', upload.single('image'), Auth.verifyToken, (req, res) =>
     // console.log(req.file);
     Gifs.createGif(req, res, result.secure_url);
   });
+});
+app.get('api/v1/checkToken', Auth.verifyToken, (req, res) => {
+  res.status(200);
 });
 
 app.get('/api/v1/feeds', Auth.verifyToken, async (req, res) => {

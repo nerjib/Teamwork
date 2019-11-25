@@ -34,7 +34,7 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  await db.query('DROP TABLE gifcomments');
+//  await db.query('DROP TABLE gifcomments');
   await db.query('DROP TABLE students');
   await db.query('DROP TABLE comments');
   await db.query('DROP TABLE gifs');
@@ -58,9 +58,6 @@ describe('POST /create', () => {
         dept: 'IT',
         address: 'KD',
       });
-    // make sure we add it correctly
-    // expect(login.body.fname).toBe('id');
-    // expect(newStudent.body.name).toBe('New Student');
     console.log(response.body.data);
     expect(response.body.data).toHaveProperty('token');
     expect(response.body.data.message).toBe('User account successfully created');

@@ -118,7 +118,7 @@ router.post('/:id/comments', async (req, res) => {
 
 // select all articles
 router.get('/', async (req, res) => {
-  const findAllQuery = 'SELECT * FROM articles';
+  const findAllQuery = 'SELECT * FROM articles ORDER BY createdon DESC';
   try {
     const { rows } = await db.query(findAllQuery);
     return res.status(200).send({ status: 'success', rows });

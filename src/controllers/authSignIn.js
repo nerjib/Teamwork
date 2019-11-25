@@ -5,7 +5,6 @@ const Helper = require('./helper');
 const router = express.Router();
 const db = require('../dbs/index');
 
-
 router.post('/', async (req, res) => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).send({ message: 'Some values are missing' });
@@ -32,7 +31,9 @@ router.post('/', async (req, res) => {
         userId: rows[0].id,
       },
     };
+
     res.cookie('token', token, { httpOnly: true }).status(200);
+    res.set('token', token);
     return res.status(200).send(response);
   } catch (error) {
     return res.status(405).send(error);

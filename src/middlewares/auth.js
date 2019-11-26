@@ -26,7 +26,7 @@ async function verifyToken(req, res, next) {
   }
 }
 async function verifyAdmin(req, res, next) {
-  const token = req.headers['token'];
+  const token = req.cookies.token || req.headers['token'];
   if (!token) {
     return res.status(400).send({ message: 'Token is not provided' });
   }

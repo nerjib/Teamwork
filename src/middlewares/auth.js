@@ -7,10 +7,7 @@ const db = require('../dbs/index');
 
 
 async function verifyToken(req, res, next) {
-  const token = req.headers['token']
-  || req.cookies['token'] || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1NzQ2OTQwNDEsImV4cCI6MTU3NTI5ODg0MX0.wwNR54OA5KQAo_cpgaI1dzWDzdghGY9K1yRCDKofjpk';
-  console.log(`cookiess${req.cookies['token']}`);
-
+  const token = req.cookies.token || req.headers['token'];
   if (!token) {
     return res.status(400).send({ message: 'Token is not provided' });
   }

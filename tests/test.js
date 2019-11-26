@@ -34,7 +34,7 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-//  await db.query('DROP TABLE gifcomments');
+  await db.query('DROP TABLE gifcomments');
   await db.query('DROP TABLE students');
   await db.query('DROP TABLE comments');
   await db.query('DROP TABLE gifs');

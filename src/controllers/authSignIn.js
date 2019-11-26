@@ -1,8 +1,10 @@
 const express = require('express');
 
+const CokokieParser = require('cookie-parser');
 const Helper = require('./helper');
 
 const router = express.Router();
+router.use(CokokieParser());
 const db = require('../dbs/index');
 
 router.post('/', async (req, res) => {
@@ -32,8 +34,11 @@ router.post('/', async (req, res) => {
       },
     };
 
-    res.cookie('token', token, { httpOnly: true }).status(200);
-    res.set('token', token);
+    res.cookie('token', token, { maxAge: 90000000, httpOnly: true }).status(200);
+    // res.set('token1', token);
+    // console.log(token);
+    // res.send({ message: 'token send' });
+
     return res.status(200).send(response);
   } catch (error) {
     return res.status(405).send(error);

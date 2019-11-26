@@ -7,16 +7,16 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const http = require('http');
 const path = require('path');
-
-
 const cloudinary = require('cloudinary');
 const multer = require('multer');
 const dotenv = require('dotenv');
+const db = require('./src/dbs/index');
+const Helper = require('./src/controllers/helper');
 const Users = require('./src/controllers/users');
 const authUsers = require('./src/controllers/authUsers');
 const Articles = require('./src/controllers/Articles');
 const Gifs = require('./src/controllers/gifs');
-const authUsersSignIn = require('./src/controllers/authSignIn');
+ const authUsersSignIn = require('./src/controllers/authSignIn');
 const Feeds = require('./src/controllers/feeds');
 
 const Auth = require('./src/middlewares/auth');
@@ -46,7 +46,6 @@ app.use((req, res, next) => {
 });
 
 app.use(cors());
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -113,5 +112,7 @@ app.get('api/v1/checkToken', Auth.verifyToken, (req, res) => {
 app.get('/api/v1/feeds', Auth.verifyToken, async (req, res) => {
   Feeds.getAll(req, res);
 });
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 module.exports = app;

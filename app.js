@@ -76,11 +76,30 @@ const upload = multer({
   fileFilter,
 });
 
+// app.use('/api/v1/articles', Articles);
+app.post('/api/v1/articles', Auth.verifyToken, async (req, res) => {
+  Articles.postArticle(req, res);
+});
+app.get('/api/v1/articles', Auth.verifyToken, async (req, res) => {
+  Articles.getAll(req, res);
+});
+app.get('/api/v1/articles/:id', Auth.verifyToken, async (req, res) => {
+  Articles.getOne(req, res);
+});
+app.post('/api/v1/articles/:id/comment', Auth.verifyToken, async (req, res) => {
+  Articles.postComment(req, res);
+});
+app.put('/api/v1/articles/:id', Auth.verifyToken, async (req, res) => {
+  Articles.updateArticle(req, res);
+});
+app.delete('/api/v1/articles/:id', Auth.verifyToken, async (req, res) => {
+  Articles.deleteArticle(req, res);
+});
 app.use('/api/v1/users', Auth.verifyToken, Users);
 app.use('/api/v1/auth/create-user', Auth.verifyAdmin, authUsers);
 app.use('/api/v1/auth/signin', authUsersSignIn);
-app.use('/api/v1/articles', Auth.verifyToken, Articles);
-app.post('/api/v1/gifs/:id/comments', Auth.verifyToken, async (req, res) => {
+
+app.post('/api/v1/gifs/:id/comment', Auth.verifyToken, async (req, res) => {
   Gifs.postGifComment(req, res);
 });
 app.get('/api/v1/gifs', Auth.verifyToken, async (req, res) => {
@@ -105,10 +124,15 @@ app.post('/api/v1/gifs', upload.single('image'), Auth.verifyToken, (req, res) =>
     Gifs.createGif(req, res, result.secure_url);
   });
 });
-app.get('api/v1/checkToken', Auth.verifyToken, (req, res) => {
-  res.status(200);
-});
 
+app.get('/api/v1/checktoken', Auth.verifyToken, (req, res) => {
+  res.status(200).send({
+    status: 'ok',
+  });
+});
+app.get('/api/v1/checkrole', Auth.verifyAdmin, (req, res) => {
+  res.status(200).send({status: 'ok'});
+});
 app.get('/api/v1/feeds', Auth.verifyToken, async (req, res) => {
   Feeds.getAll(req, res);
 });

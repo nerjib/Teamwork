@@ -2,13 +2,13 @@
 const express = require('express');
 const moment = require('moment');
 
-const router = express.Router();
 const db = require('../dbs/index');
 
-router.post('/', async (req, res) => {
+async function postArticle(req, res) {
   const createQuery = `INSERT INTO
       articles (userid, title, article, createdon)
       VALUES ($1, $2, $3, $4) RETURNING *`;
+  console.log(req);
   const values = [
     req.user.id,
     req.body.title,
@@ -31,11 +31,11 @@ router.post('/', async (req, res) => {
   } catch (error) {
     return res.status(400).send(error);
   }
-});
+}
 
 // update article
 
-router.put('/:id', async (req, res) => {
+async function updateArticle(req, res) {
   const findOneQuery = 'SELECT * FROM articles WHERE id=$1 AND userid = $2';
   const updateOneQuery = `UPDATE articles
       SET article=$1 WHERE id=$2  AND  userid=$3 RETURNING *`;
@@ -64,10 +64,10 @@ router.put('/:id', async (req, res) => {
   } catch (err) {
     return res.status(400).send('article not updated');
   }
-});
+}
 
 // delete an article
-router.delete('/:id', async (req, res) => {
+async function deleteArticle(req, res) {
   const deleteQuery = 'DELETE FROM articles WHERE id=$1 and userid=$2 returning  *';
   // console.log(req.user.id);
   // i'll come back and put & user.id
@@ -85,10 +85,10 @@ router.delete('/:id', async (req, res) => {
   } catch (error) {
     return res.status(400).send(error);
   }
-});
+}
 
 // add comment
-router.post('/:id/comments', async (req, res) => {
+async function postComment(req, res)  {
   const createQuery = `INSERT INTO comments
             (userid, comment, articleid, post_date)
           VALUES($1, $2, $3, $4)
@@ -114,10 +114,10 @@ router.post('/:id/comments', async (req, res) => {
   } catch (error) {
     return res.status(400).send(error);
   }
-});
+}
 
 // select all articles
-router.get('/', async (req, res) => {
+async function getAll(req, res) {
   const findAllQuery = 'SELECT * FROM articles ORDER BY createdon DESC';
   try {
     const { rows } = await db.query(findAllQuery);
@@ -125,10 +125,10 @@ router.get('/', async (req, res) => {
   } catch (error) {
     return res.status(400).send(error);
   }
-});
+}
 
 
-router.get('/:id', async (req, res) => {
+async function getOne(req, res) {
   const text = 'SELECT * FROM articles WHERE id = $1';
   // const text = 'SELECT articles.article, comments.comment FROM articles INNER JOIN comments ON
   // article.id=comments.userid';
@@ -151,6 +151,13 @@ router.get('/:id', async (req, res) => {
   } catch (error) {
     return res.status(400).send(error);
   }
-});
+}
 
-module.exports = router;
+module.exports = {
+  postArticle,
+  updateArticle,
+  deleteArticle,
+  getAll,
+  getOne,
+  postComment,
+};

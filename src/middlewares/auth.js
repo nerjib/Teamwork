@@ -7,7 +7,7 @@ const db = require('../dbs/index');
 
 
 async function verifyToken(req, res, next) {
-  const token = req.cookies.token || req.headers['token'];
+  const token = req.headers['token'] || req.cookies.token;
   if (!token) {
     return res.status(400).send({ message: 'Token is not provided' });
   }

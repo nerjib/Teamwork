@@ -49,8 +49,10 @@ app.use((req, res, next) => {
 });
 */
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 const storage = multer.diskStorage({
@@ -139,6 +141,5 @@ app.get('/api/v1/feeds', Auth.verifyToken, async (req, res) => {
   Feeds.getAll(req, res);
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
 
 module.exports = app;

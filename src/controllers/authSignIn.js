@@ -1,10 +1,8 @@
 const express = require('express');
 
-const CokokieParser = require('cookie-parser');
 const Helper = require('./helper');
 
 const router = express.Router();
-router.use(CokokieParser());
 const db = require('../dbs/index');
 
 router.post('/', async (req, res) => {

@@ -29,12 +29,9 @@ dotenv.config();
 // HANDLING CORS ERRORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', '*');
-  if (req.method === 'OPTIONS') {
-    res.headers('Access-Control-Allow-Methods', 'POST, PUT, GET, DELETE');
-    return res.status(200).json({});
-  }
-  next();
+  res.header('Access-Control-Allow-Headers', 'Origin, X-requested-With, Content, Accept, Content-Type, Authorization');
+    res.headers('Access-Control-Allow-Methods', 'POST, PUT, GET, DELETE, PATCH, OPTIONS');
+    next();
 });
 
 /*
